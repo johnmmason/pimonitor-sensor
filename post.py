@@ -35,7 +35,7 @@ if __name__ == '__main__':
         if (temperature_c is None) or (humidity is None):
             continue
         
-        temperature_f = temperature_c*(9/5)+32
+        temperature_f = temperature_c*(9/5)+32+int(cfg['calibration']['fahrenheit_offset'])
         
         localtime = datetime.now(pytz.timezone(cfg['device']['tz']))
         localtime_str = localtime.strftime("%m/%d/%Y %H:%M:%S")
