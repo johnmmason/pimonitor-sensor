@@ -5,8 +5,14 @@ import adafruit_dht
 import pytz
 from datetime import datetime
 import configparser
+import hashlib
 
 dhtDevice = adafruit_dht.DHT22(board.D4)
+
+def hash_key(key_str):
+    m = hashlib.sha256()
+    m.update( bytes(key_str, 'utf-8') )
+    return str(m.hexdigest())
 
 def post(url, data):
     headers = {
@@ -19,7 +25,9 @@ def post(url, data):
 
 if __name__ == '__main__':
     cfg = configparser.ConfigParser()
-    cfg.read('/home/pi/temp/config.ini')
+    cfg.read('/home/pi/pimonitor-sensor/config.ini')
+
+    api_key_hash = hash_key(cfg['server']['api_key'])
     
     while True:
         try:
@@ -41,6 +49,7 @@ if __name__ == '__main__':
         localtime_str = localtime.strftime("%m/%d/%Y %H:%M:%S")
             
         data = {
+            'api_hash': api_key_hash,
             'location': cfg['device']['location'],
             'timestamp': localtime_str,
             'sensors': [
